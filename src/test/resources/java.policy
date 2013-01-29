@@ -1,0 +1,29 @@
+// for Intellij
+grant codebase "file:${idea.launcher.bin.path}/../-" {
+    permission java.security.AllPermission;
+};
+
+// for Maven artifacts
+grant codebase "file:${maven.repo.local}/-" {
+    permission java.security.AllPermission;
+};
+grant codebase "file:${user.home}/.m2/repository/-" {
+    permission java.security.AllPermission;
+};
+
+//
+grant codebase "file:target/classes/-" {
+    permission java.security.AllPermission;
+};
+
+// for the security test case
+grant codebase "file:target/test-classes/-" principal javax.management.remote.JMXPrincipal "test" {
+    permission java.lang.RuntimePermission "setSecurityManager";
+    permission javax.security.auth.AuthPermission "doAs";
+    permission org.jboss.beach.askpass.AskpassConfigurationPermission "setCommand";
+};
+
+grant codebase "file:target/test-classes/-" {
+    permission java.lang.RuntimePermission "setSecurityManager";
+    permission javax.security.auth.AuthPermission "doAs";
+};
