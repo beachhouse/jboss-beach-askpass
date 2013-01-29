@@ -18,12 +18,12 @@ grant codebase "file:target/classes/-" {
 
 // for the security test case
 grant codebase "file:target/test-classes/-" principal javax.management.remote.JMXPrincipal "test" {
-    permission java.lang.RuntimePermission "setSecurityManager";
-    permission javax.security.auth.AuthPermission "doAs";
     permission org.jboss.beach.askpass.AskpassConfigurationPermission "setCommand";
 };
 
+// we want to switch protection domain in the test
 grant codebase "file:target/test-classes/-" {
+    permission java.lang.RuntimePermission "getProtectionDomain";
     permission java.lang.RuntimePermission "setSecurityManager";
-    permission javax.security.auth.AuthPermission "doAs";
+    permission java.security.SecurityPermission "createAccessControlContext";
 };

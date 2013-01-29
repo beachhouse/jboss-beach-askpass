@@ -21,6 +21,8 @@
  */
 package org.jboss.beach.askpass;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.management.remote.JMXPrincipal;
@@ -40,32 +42,37 @@ import static org.junit.Assert.fail;
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public class AskpassSecurityTestCase {
+    private SecurityManager previousSM;
+
     private static <T> T[] array(T... a) {
         return a;
     }
 
+    @After
+    public void after() {
+        System.setSecurityManager(previousSM);
+        previousSM = null;
+    }
+
+    @Before
+    public void before() {
+        this.previousSM = System.getSecurityManager();
+        System.setSecurityManager(new SecurityManager());
+    }
+
     @Test
     public void testNoConfigurationPermission() {
-        final SecurityManager previousSM = System.getSecurityManager();
         try {
-            System.setSecurityManager(new SecurityManager());
             final Askpass askpass = new Askpass();
             askpass.setCommand("poof");
             fail("Expected SecurityException");
         } catch (SecurityException e) {
             // good
-        } finally {
-            System.setSecurityManager(previousSM);
         }
     }
 
     @Test
     public void testWithConfigurationPermission() {
-        final Subject subject = new Subject();
-        // any simple principal will do, just make sure java.policy is updated accordingly
-        subject.getPrincipals().add(new JMXPrincipal("test"));
-        subject.setReadOnly(); // superfluous
-
         // the test-classes codebase (without principal) does not have permission, so we need to leave that one behind
         final AccessControlContext context = new AccessControlContext(array(Askpass.class.getProtectionDomain()));
         final AccessControlContext context1 = new AccessControlContext(context, new DomainCombiner() {
@@ -78,19 +85,20 @@ public class AskpassSecurityTestCase {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override
             public Void run() {
+                final Subject subject = new Subject();
+                // any simple principal will do, just make sure java.policy is updated accordingly
+                subject.getPrincipals().add(new JMXPrincipal("test"));
+                subject.setReadOnly(); // superfluous
+
                 Subject.doAs(subject, new PrivilegedAction<Void>() {
                     @Override
                     public Void run() {
                         // from this point on we have test-classes codebase with a principal protection domain
-                        final SecurityManager previousSM = System.getSecurityManager();
                         try {
-                            System.setSecurityManager(new SecurityManager());
                             final Askpass askpass = new Askpass();
                             askpass.setCommand("poof");
                         } catch (SecurityException e) {
                             fail("Caught " + e);
-                        } finally {
-                            System.setSecurityManager(previousSM);
                         }
                         return null;
                     }
