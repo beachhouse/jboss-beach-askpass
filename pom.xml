@@ -55,4 +55,10 @@
          <scope>test</scope>
       </dependency>
    </dependencies>
+
+   <scm>
+      <connection>scm:git:https://github.com/beachhouse/jboss-beach-askpass.git</connection>
+      <developerConnection>scm:git:git@github.com:beachhouse/jboss-beach-askpass.git</developerConnection>
+      <url>https://github.com/beachhouse/jboss-beach-askpass</url>
+   </scm>
 </project>
