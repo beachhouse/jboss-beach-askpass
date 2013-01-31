@@ -32,6 +32,9 @@
          <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+               <additionalClasspathElements>
+                  <additionalClasspathElement>${project.build.testSourceDirectory}/../bin</additionalClasspathElement>
+               </additionalClasspathElements>
                <argLine>-Djava.security.policy=${basedir}/src/test/resources/java.policy</argLine>
             </configuration>
          </plugin>
